@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id               String    @id @default(uuid())
+  rollNumber       String    @unique
+  name             String
+  email            String    @unique
+  phone            String?
+  gender           Gender
+  dob              DateTime?
+  department       String?
+  hostel           String?
+  roomNumber       String?
+  yearOfStudy      Int?
+  emergencyContact String?
+  bloodGroup       String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  appointments Appointment[]
+}
+
+model Doctor {
+  id             String         @id @default(uuid())
+  name           String
+  email          String         @unique
+  phone          String?
+  specialization String?
+  roomNumber     String?
+  designation    String?
+  availability   Availability[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  appointments Appointment[]
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  studentId       String
+  doctorId        String
+  appointmentDate DateTime
+  reason          String?
+  status          AppointmentStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+}
+
+model Availability {
+  id        String   @id @default(uuid())
+  doctorId  String
+  dayOfWeek Int
+  startTime DateTime
+  endTime   DateTime
+
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
