@@ -12,6 +12,7 @@ model Student {
   rollNumber       String    @unique
   name             String
   email            String    @unique
+  password         String
   phone            String?
   gender           Gender
   dob              DateTime?

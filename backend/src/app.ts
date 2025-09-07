@@ -1,8 +1,10 @@
 import express, { type Request, type Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { userRouter } from "@/routes/user.js";
+import cookieParser from "cookie-parser";
 import { errorHandler } from "@/middlewares/error-handler.js";
+import { authRouter } from "@/routes/auth.js";
+import { studentRouter } from "@/routes/student.js";
 
 const app = express();
 dotenv.config({ path: ".env" });
@@ -17,12 +19,14 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.get("/", (_req: Request, res: Response) => {
   res.status(200).send("This app was created using npx create-types-backend@latest !");
 });
 
-app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/student", studentRouter);
 
 app.use(errorHandler);
 
