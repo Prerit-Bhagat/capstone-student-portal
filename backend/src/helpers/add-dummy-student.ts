@@ -15,7 +15,7 @@ const addDummyStudent = async () => {
       roomNumber: "C-204",
       yearOfStudy: 4,
       emergencyContact: "7087394178",
-      bloodGroup: "O+",
+      bloodGroup: "O_POS",
     },
   });
 

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { RequestWithStudent } from "@/types/student.js";
+import { type RequestWithStudent } from "@/types/request.js";
 import { type NextFunction, type Response } from "express";
 import { prisma } from "@/config/prisma.js";
 import { cookieOptions } from "@/constants/cookie-options.js";
@@ -20,6 +20,13 @@ const isLoggedIn = async (req: RequestWithStudent, res: Response, next: NextFunc
       process.env.JWT_SECRET_KEY as string
     ) as JwtPayloadTypes;
 
+    if (!loggedInStudent) {
+      return res
+        .status(401)
+        .cookie("token", "", { ...cookieOptions, expires: new Date(Date.now()) })
+        .json({ message: "Invalid token !" });
+    }
+
     const student = await prisma.student.findUnique({
       where: { id: loggedInStudent.studentId },
     });
@@ -28,7 +35,7 @@ const isLoggedIn = async (req: RequestWithStudent, res: Response, next: NextFunc
       return res
         .status(401)
         .cookie("token", "", { ...cookieOptions, expires: new Date(Date.now()) })
-        .json({ message: "Session expired. Please login again !" });
+        .json({ message: "Student not found !" });
     }
 
     req.studentId = loggedInStudent.studentId;

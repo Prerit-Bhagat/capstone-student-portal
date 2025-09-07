@@ -2,27 +2,31 @@ type Gender = "MALE" | "FEMALE" | "OTHER";
 
 type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
 
-interface Student {
+type BloodGroup = "A_POS" | "A_NEG" | "B_POS" | "B_NEG" | "AB_POS" | "AB_NEG" | "O_POS" | "O_NEG";
+
+interface IStudent {
   id: string;
   rollNumber: string;
   name: string;
   email: string;
-  phone?: string;
+  password: string;
+  isPasswordDefault: boolean;
+  phone: string;
   gender: Gender;
-  dob?: Date;
-  department?: string;
-  hostel?: string;
-  roomNumber?: string;
-  yearOfStudy?: number;
-  emergencyContact?: string;
-  bloodGroup?: string;
+  dob: Date;
+  department: string;
+  hostel?: string | null;
+  roomNumber?: string | null;
+  yearOfStudy: number;
+  emergencyContact?: string | null;
+  bloodGroup: BloodGroup;
   createdAt: Date;
   updatedAt: Date;
 
   appointments?: Appointment[];
 }
 
-interface Doctor {
+interface IDoctor {
   id: string;
   name: string;
   email: string;
@@ -37,7 +41,7 @@ interface Doctor {
   appointments?: Appointment[];
 }
 
-interface Appointment {
+interface IAppointment {
   id: string;
   studentId: string;
   doctorId: string;
@@ -52,7 +56,7 @@ interface Appointment {
   doctor?: Doctor;
 }
 
-interface Availability {
+interface IAvailability {
   id: string;
   doctorId: string;
   dayOfWeek: number;

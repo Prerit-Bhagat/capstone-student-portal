@@ -8,22 +8,23 @@ datasource db {
 }
 
 model Student {
-  id               String    @id @default(uuid())
-  rollNumber       String    @unique
-  name             String
-  email            String    @unique
-  password         String
-  phone            String?
-  gender           Gender
-  dob              DateTime?
-  department       String?
-  hostel           String?
-  roomNumber       String?
-  yearOfStudy      Int?
-  emergencyContact String?
-  bloodGroup       String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                String     @id @default(uuid())
+  rollNumber        String     @unique
+  name              String
+  email             String     @unique
+  password          String
+  isPasswordDefault Boolean    @default(true)
+  phone             String
+  gender            Gender
+  dob               DateTime
+  department        String
+  hostel            String?
+  roomNumber        String?
+  yearOfStudy       Int
+  emergencyContact  String?
+  bloodGroup        BloodGroup
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   appointments Appointment[]
 }
@@ -82,4 +83,15 @@ enum AppointmentStatus {
   CONFIRMED
   COMPLETED
   CANCELLED
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
 }

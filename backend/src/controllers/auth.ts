@@ -1,8 +1,11 @@
 import { type Request, type Response } from "express";
+import bcrypt from "bcrypt";
 import { tryCatch } from "@/utils/try-catch.js";
 import { prisma } from "@/config/prisma.js";
 import { ErrorHandler } from "@/middlewares/error-handler.js";
 import { generateToken } from "@/utils/generate-token.js";
+import { getDefaultPassword } from "@/utils/default-password.js";
+import { type RequestWithStudent } from "@/types/request.js";
 
 const checkAuth = (req: Request, res: Response) => {
   const token = req.cookies?.token;
@@ -15,24 +18,47 @@ const login = tryCatch(async (req: Request, res: Response) => {
   const rollNumber: string = req.body.rollNumber;
   const password: string = req.body.password;
 
-  if (!rollNumber || !password) {
-    throw new ErrorHandler(400, "All fields are required !");
-  }
+  if (!rollNumber || !password) throw new ErrorHandler(400, "All fields are required !");
 
   const student = await prisma.student.findUnique({ where: { rollNumber } });
-  if (!student) {
-    throw new ErrorHandler(401, "Invalid Credentials !");
-  }
+  if (!student) throw new ErrorHandler(401, "Invalid credentials !");
 
-  const matchPassword = student.password === password;
-  if (!matchPassword) {
-    throw new ErrorHandler(401, "Invalid Credentials !");
-  }
+  let matchPassword = false;
+  if (student.isPasswordDefault) matchPassword = password === getDefaultPassword(student);
+  else matchPassword = await bcrypt.compare(password, student.password);
+
+  if (!matchPassword) throw new ErrorHandler(401, "Invalid credentials !");
 
   generateToken(res, student.id);
   return res.status(200).json({ message: `Welcome ${student.name} !` });
 });
 
-const updatePassword = tryCatch(async (_req: Request, _res: Response) => {});
+const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) => {
+  const oldPassword: string = req.body.oldPassword;
+  if (!oldPassword) throw new ErrorHandler(400, "Current password is required !");
+  const newPassword: string = req.body.newPassword;
+  if (!newPassword) throw new ErrorHandler(400, "New password cannot be empty !");
+  if (oldPassword === newPassword)
+    throw new ErrorHandler(400, "Current and New password cannot be same !");
+
+  const studentId = req.studentId;
+  if (!studentId) throw new ErrorHandler(401, "Unauthorized !");
+  const student = await prisma.student.findUnique({ where: { id: studentId } });
+  if (!student) throw new ErrorHandler(404, "Student not found !");
+
+  let matchOldPassword = false;
+  if (student.isPasswordDefault) matchOldPassword = oldPassword === getDefaultPassword(student);
+  else matchOldPassword = await bcrypt.compare(oldPassword, student.password);
+
+  if (!matchOldPassword) throw new ErrorHandler(401, "Current password is incorrect !");
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await prisma.student.update({
+    where: { id: studentId },
+    data: { password: hashedPassword, isPasswordDefault: false },
+  });
+
+  return res.status(200).json({ message: "Password updated successfully !" });
+});
 
 export { checkAuth, login, updatePassword };

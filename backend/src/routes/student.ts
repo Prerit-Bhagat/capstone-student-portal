@@ -1,8 +1,8 @@
 import express from "express";
-import { getStudent } from "@/controllers/student.js";
+import { getAllStudents } from "@/controllers/student.js";
 
 const router = express.Router();
 
-router.get("/get-student", getStudent);
+router.get("/all", getAllStudents);
 
 export { router as studentRouter };

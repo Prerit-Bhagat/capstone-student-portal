@@ -1,29 +1,13 @@
-import type { Request, Response } from "express";
+import { type Request, type Response } from "express";
 import { tryCatch } from "@/utils/try-catch.js";
+import { prisma } from "@/config/prisma.js";
 import { ErrorHandler } from "@/middlewares/error-handler.js";
 
-const getStudent = tryCatch(async (_req: Request, res: Response) => {
-  const student: Student = {
-    id: "696969",
-    rollNumber: "1022033356",
-    name: "Arshiaaaaahhhhhhh",
-    email: "arshiah@pornhub.com",
-    phone: "9876543210",
-    gender: "FEMALE",
-    dob: new Date("09-09-2001"),
-    department: "COE",
-    hostel: "F",
-    roomNumber: "C-69",
-    yearOfStudy: 4,
-    emergencyContact: "",
-    bloodGroup: "F+",
-    createdAt: new Date(Date.now()),
-    updatedAt: new Date(Date.now()),
-  };
+const getAllStudents = tryCatch(async (_req: Request, res: Response) => {
+  const students = await prisma.student.findMany({});
 
-  if (!student) throw new ErrorHandler(404, "Student not found !");
-
-  return res.status(200).json(student);
+  if (!students || students.length === 0) throw new ErrorHandler(204, "No students found !");
+  return res.status(200).json(students);
 });
 
-export { getStudent };
+export { getAllStudents };
