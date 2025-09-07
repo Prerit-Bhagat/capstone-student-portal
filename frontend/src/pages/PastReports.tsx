@@ -1,15 +1,19 @@
 "use client";
-import { DashboardLayout } from "../../layout/AppLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
-import  Button  from "../../components/ui/Button";
-import { Badge } from "../../components/ui/badge";
-import { Calendar, Download, Eye, FileText, Clock } from "lucide-react";
+import { Calendar, Clock, Download, Eye, FileText } from "lucide-react";
 import { useState } from "react";
+import Button from "../components/ui/Button";
+import { Badge } from "../components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { DashboardLayout } from "../layout/AppLayout";
 
 export default function PastReportsPage() {
-  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  const [_selectedReport, setSelectedReport] = useState<string | null>(null);
 
-  // Mock past reports data - this would come from your database
   const pastReports = [
     {
       id: "1",
@@ -44,7 +48,7 @@ export default function PastReportsPage() {
     {
       id: "4",
       date: "2024-10-05",
-      doctor: "Dr. Suman Sharma",
+      doctor: "Dr. Aman Arora",
       type: "Fever Consultation",
       diagnosis: "Viral fever - Recovery expected in 5-7 days",
       prescription: "Paracetamol, rest, adequate fluid intake",
@@ -66,12 +70,10 @@ export default function PastReportsPage() {
 
   const handleViewReport = (reportId: string) => {
     setSelectedReport(reportId);
-    // Here you would typically open a modal or navigate to detailed view
     alert(`Viewing detailed report for ID: ${reportId}`);
   };
 
   const handleDownloadReport = (reportId: string) => {
-    // Here you would typically trigger a download
     alert(`Downloading report for ID: ${reportId}`);
   };
 

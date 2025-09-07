@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { Menu } from "lucide-react";
+import { useState } from "react";
 
 interface HeaderProps {
   title: string;
@@ -14,7 +14,7 @@ interface HeaderProps {
 export function Header({
   title,
   onMenuClick,
-  user = { name: "Neeraj Kumar", role: "Student" },
+  user = { name: "Sukhi Singh", role: "Student" },
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
