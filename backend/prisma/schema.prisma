@@ -33,9 +33,9 @@ model Doctor {
   id             String         @id @default(uuid())
   name           String
   email          String         @unique
-  phone          String?
+  phone          String
+  gender         Gender
   specialization String?
-  roomNumber     String?
   designation    String?
   availability   Availability[]
   createdAt      DateTime       @default(now())

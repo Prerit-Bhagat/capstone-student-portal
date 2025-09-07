@@ -22,4 +22,19 @@ const addDummyStudent = async () => {
   console.log("Dummy student added:", student);
 };
 
-export { addDummyStudent };
+const addDummyDoctor = async () => {
+  const doctor = await prisma.doctor.create({
+    data: {
+      name: "Dr. Zulfikar Qureshi",
+      email: "zulfikar.qureshi@thapar.edu",
+      phone: "9876543210",
+      gender: "MALE",
+      specialization: "General Physician",
+      designation: "Senior Medical Officer",
+    },
+  });
+
+  console.log("Dummy doctor added:", doctor);
+};
+
+export { addDummyStudent, addDummyDoctor };
