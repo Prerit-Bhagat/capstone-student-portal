@@ -26,7 +26,7 @@ export function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post(`/user/login`, formData);
+      const response = await api.post(`/api/auth/login`, formData);
       console.log("Success:", response.data);
 
       const { role } = response.data;
