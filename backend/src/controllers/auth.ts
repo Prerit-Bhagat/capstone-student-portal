@@ -6,6 +6,7 @@ import { ErrorHandler } from "@/middlewares/error-handler.js";
 import { generateToken } from "@/utils/generate-token.js";
 import { getDefaultPassword } from "@/utils/default-password.js";
 import { type RequestWithStudent } from "@/types/request.js";
+import { type IStudent } from "@/types/types.js";
 
 const checkAuth = (req: Request, res: Response) => {
   const token = req.cookies?.token;
@@ -20,7 +21,7 @@ const login = tryCatch(async (req: Request, res: Response) => {
 
   if (!rollNumber || !password) throw new ErrorHandler(400, "All fields are required !");
 
-  const student = await StudentModel.findOne({ rollNumber }).select("+password");
+  const student: IStudent = await StudentModel.findOne({ rollNumber }).select("+password");
   if (!student) throw new ErrorHandler(401, "Invalid credentials !");
 
   let matchPassword = false;
@@ -43,7 +44,7 @@ const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) =
 
   const studentId = req.studentId;
   if (!studentId) throw new ErrorHandler(401, "Unauthorized !");
-  const student = await StudentModel.findById(studentId).select("+password");
+  const student: IStudent = await StudentModel.findById(studentId).select("+password");
   if (!student) throw new ErrorHandler(404, "Student not found !");
 
   let matchOldPassword = false;

@@ -1,11 +1,11 @@
+import { Document, Types } from "mongoose";
+
 type Gender = "MALE" | "FEMALE" | "OTHER";
-
 type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
-
 type BloodGroup = "A_POS" | "A_NEG" | "B_POS" | "B_NEG" | "AB_POS" | "AB_NEG" | "O_POS" | "O_NEG";
 
-interface IStudent {
-  id: string;
+interface IStudent extends Document {
+  _id: Types.ObjectId;
   rollNumber: string;
   name: string;
   email: string;
@@ -15,53 +15,49 @@ interface IStudent {
   gender: Gender;
   dob: Date;
   department: string;
-  hostel?: string | null;
-  roomNumber?: string | null;
+  hostel?: string;
+  roomNumber?: string;
   yearOfStudy: number;
-  emergencyContact?: string | null;
+  emergencyContact?: string;
   bloodGroup: BloodGroup;
+  appointments: Types.ObjectId[];
+
   createdAt: Date;
   updatedAt: Date;
-
-  appointments?: Appointment[];
 }
 
-interface IDoctor {
-  id: string;
+interface IDoctor extends Document {
+  _id: Types.ObjectId;
   name: string;
   email: string;
-  phone?: string;
+  phone: string;
+  gender: Gender;
   specialization?: string;
-  roomNumber?: string;
   designation?: string;
+  availability: Types.ObjectId[];
+  appointments: Types.ObjectId[];
+
   createdAt: Date;
   updatedAt: Date;
-
-  availability?: Availability[];
-  appointments?: Appointment[];
 }
 
-interface IAppointment {
-  id: string;
-  studentId: string;
-  doctorId: string;
+interface IAppointment extends Document {
+  _id: Types.ObjectId;
+  studentId: Types.ObjectId | IStudent;
+  doctorId: Types.ObjectId | IDoctor;
   appointmentDate: Date;
   reason?: string;
   status: AppointmentStatus;
   notes?: string;
+
   createdAt: Date;
   updatedAt: Date;
-
-  student?: Student;
-  doctor?: Doctor;
 }
 
-interface IAvailability {
-  id: string;
-  doctorId: string;
+interface IAvailability extends Document {
+  _id: Types.ObjectId;
+  doctorId: Types.ObjectId | IDoctor;
   dayOfWeek: number;
   startTime: Date;
   endTime: Date;
-
-  doctor?: Doctor;
 }

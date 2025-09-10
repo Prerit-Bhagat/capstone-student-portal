@@ -1,3 +1,5 @@
+import { IStudent } from "@/types/types.js";
+
 const extractName = (name: string): string => {
   return name.replace(/\s+/g, "");
 };
