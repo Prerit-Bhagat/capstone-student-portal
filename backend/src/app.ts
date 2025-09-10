@@ -3,11 +3,13 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "@/middlewares/error-handler.js";
+import { connectDB } from "@/config/db.js";
 import { authRouter } from "@/routes/auth.js";
 import { studentRouter } from "@/routes/student.js";
 
 const app = express();
 dotenv.config({ path: ".env" });
+await connectDB();
 
 app.use(
   cors({

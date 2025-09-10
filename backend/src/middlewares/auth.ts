@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { type RequestWithStudent } from "@/types/request.js";
 import { type NextFunction, type Response } from "express";
-import { prisma } from "@/config/prisma.js";
+import { StudentModel } from "@/models/student.js";
 import { cookieOptions } from "@/constants/cookie-options.js";
 
 interface JwtPayloadTypes {
@@ -27,9 +27,7 @@ const isLoggedIn = async (req: RequestWithStudent, res: Response, next: NextFunc
         .json({ message: "Invalid token !" });
     }
 
-    const student = await prisma.student.findUnique({
-      where: { id: loggedInStudent.studentId },
-    });
+    const student = await StudentModel.findById(loggedInStudent.studentId);
 
     if (!student) {
       return res

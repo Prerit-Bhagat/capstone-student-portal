@@ -1,7 +1,7 @@
 import { type Request, type Response } from "express";
 import bcrypt from "bcrypt";
 import { tryCatch } from "@/utils/try-catch.js";
-import { prisma } from "@/config/prisma.js";
+import { StudentModel } from "@/models/student.js";
 import { ErrorHandler } from "@/middlewares/error-handler.js";
 import { generateToken } from "@/utils/generate-token.js";
 import { getDefaultPassword } from "@/utils/default-password.js";
@@ -20,7 +20,7 @@ const login = tryCatch(async (req: Request, res: Response) => {
 
   if (!rollNumber || !password) throw new ErrorHandler(400, "All fields are required !");
 
-  const student = await prisma.student.findUnique({ where: { rollNumber } });
+  const student = await StudentModel.findOne({ rollNumber }).select("+password");
   if (!student) throw new ErrorHandler(401, "Invalid credentials !");
 
   let matchPassword = false;
@@ -43,7 +43,7 @@ const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) =
 
   const studentId = req.studentId;
   if (!studentId) throw new ErrorHandler(401, "Unauthorized !");
-  const student = await prisma.student.findUnique({ where: { id: studentId } });
+  const student = await StudentModel.findById(studentId).select("+password");
   if (!student) throw new ErrorHandler(404, "Student not found !");
 
   let matchOldPassword = false;
@@ -53,9 +53,9 @@ const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) =
   if (!matchOldPassword) throw new ErrorHandler(401, "Current password is incorrect !");
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await prisma.student.update({
-    where: { id: studentId },
-    data: { password: hashedPassword, isPasswordDefault: false },
+  await StudentModel.findByIdAndUpdate(studentId, {
+    password: hashedPassword,
+    isPasswordDefault: false,
   });
 
   return res.status(200).json({ message: "Password updated successfully !" });
