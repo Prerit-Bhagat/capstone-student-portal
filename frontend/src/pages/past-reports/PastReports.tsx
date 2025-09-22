@@ -1,15 +1,16 @@
 "use client";
-import { Calendar, Clock, Download, Eye, FileText } from "lucide-react";
-import { useState } from "react";
-import Button from "../components/ui/Button";
-import { Badge } from "../components/ui/badge";
+import { DashboardLayout } from "../../layout/AppLayout";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { DashboardLayout } from "../layout/AppLayout";
+} from "../../components/ui/card";
+import Button from "../../components/ui/Button";
+import { Badge } from "../../components/ui/badge";
+import { Calendar, Download, Eye, FileText, Clock } from "lucide-react";
+import { useState } from "react";
+import Access from "../../common/access";
 
 export default function PastReportsPage() {
   const [_selectedReport, setSelectedReport] = useState<string | null>(null);

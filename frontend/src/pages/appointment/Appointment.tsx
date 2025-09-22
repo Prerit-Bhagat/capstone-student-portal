@@ -1,13 +1,14 @@
-import { DashboardLayout } from "../layout/AppLayout";
-import { Card, CardContent } from "../components/ui/card";
-import Button from "../components/ui/Button";
+import { DashboardLayout } from "../../layout/AppLayout";
+import { Card, CardContent } from "../../components/ui/card";
+import Button from "../../components/ui/Button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../components/ui/collapsible";
+} from "../../components/ui/collapsible";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import Access from "../../common/access";
 
 export default function AppointmentPage() {
   const [doctorsExpanded, setDoctorsExpanded] = useState(true);

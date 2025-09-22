@@ -1,5 +1,7 @@
+import { DashboardLayout } from "../../layout/AppLayout";
+import { Card, CardContent } from "../../components/ui/card";
 import { User } from "lucide-react";
-import { DashboardLayout } from "../layout/AppLayout";
+import Access from "../../common/access";
 
 export default function DashboardPage() {
   const studentData = {
