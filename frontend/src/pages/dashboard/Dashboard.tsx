@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../store/userContext";
@@ -23,7 +21,7 @@ export default function DashboardPage() {
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-4">Welcome, {user.name}</h1>
         <p>
-          <strong>Roll No:</strong> {user.roll_no}
+          <strong>Roll No:</strong> {user.rollNumber}
         </p>
         <p>
           <strong>Email:</strong> {user.email}

@@ -6,6 +6,7 @@ import { errorHandler } from "@/middlewares/error-handler.js";
 import { connectDB } from "@/config/db.js";
 import { authRouter } from "@/routes/auth.js";
 import { studentRouter } from "@/routes/student.js";
+import { addDummyStudent } from "./helpers/dummy-data";
 
 const app = express();
 dotenv.config({ path: ".env" });
@@ -35,4 +36,5 @@ app.use(errorHandler);
 const PORT = Number(process.env.PORT) || 4000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  // addDummyStudent();
 });

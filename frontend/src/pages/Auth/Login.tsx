@@ -6,16 +6,16 @@ import { ToastContainer, toast } from "react-toastify";
 import { useUser } from "../../store/userContext";
 
 interface LoginFormData {
-  roll_no: string;
+  rollNumber: string;
   password: string;
 }
 
 export function Auth() {
-  const { login, loading, user } = useUser();
+  const { login, loading } = useUser();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<LoginFormData>({
-    roll_no: "",
+    rollNumber: "",
     password: "",
   });
 
@@ -26,9 +26,9 @@ export function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(formData.roll_no, formData.password);
+      await login(formData.rollNumber, formData.password);
       toast.success("Logged in successfully!");
-      navigate("/"); // go to home/dashboard
+      navigate("/"); // go to dashboard
     } catch (err) {
       toast.error("Login failed");
       console.error(err);
@@ -36,38 +36,146 @@ export function Auth() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-100">
+    <div className="h-screen w-full relative">
       <ToastContainer />
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow-md w-full max-w-md"
-      >
-        <h1 className="text-2xl font-bold mb-4">Login</h1>
-        <Input
-          type="text"
-          name="roll_no"
-          placeholder="Roll Number"
-          value={formData.roll_no}
-          onChange={handleChange}
-          required
-          className="mb-4"
-        />
-        <Input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          required
-          className="mb-4"
-        />
-        <Button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
-        </Button>
-      </form>
+      {/* Background Image */}
+      <div
+        className="h-full w-full fixed flex items-center justify-center blur-sm z-10"
+        style={{
+          backgroundImage: `url("/bg.jpeg")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      ></div>
+
+      {/* Login Card */}
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md space-y-6 relative z-20 mx-auto top-[15%]">
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <img
+            src="/tiet_logo.jpg"
+            alt="TIET Logo"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+          <h1 className="text-2xl font-semibold text-gray-800">TIET MEDIHUB</h1>
+        </div>
+
+        {/* Title */}
+        <div>
+          <h2 className="text-xl font-medium text-gray-700">Log in</h2>
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-rows-2 gap-4 mb-5">
+            <Input
+              type="text"
+              name="rollNumber"
+              placeholder="Roll Number"
+              value={formData.rollNumber}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            />
+            <Input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            />
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <a
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot password?
+            </a>
+          </div>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
+
+// import React, { useState } from "react";
+// import { Input } from "../../components/ui/input";
+// import Button from "../../components/ui/Button";
+// import { useNavigate } from "react-router-dom";
+// import { ToastContainer, toast } from "react-toastify";
+// import { useUser } from "../../store/userContext";
+
+// interface LoginFormData {
+//   rollNumber: string;
+//   password: string;
+// }
+
+// export function Auth() {
+//   const { login, loading, user } = useUser();
+//   const navigate = useNavigate();
+
+//   const [formData, setFormData] = useState<LoginFormData>({
+//     rollNumber: "",
+//     password: "",
+//   });
+
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     try {
+//       await login(formData.rollNumber, formData.password);
+//       toast.success("Logged in successfully!");
+//       navigate("/"); // go to home/dashboard
+//     } catch (err) {
+//       toast.error("Login failed");
+//       console.error(err);
+//     }
+//   };
+
+//   return (
+//     <div className="h-screen flex items-center justify-center bg-gray-100">
+//       <ToastContainer />
+//       <form
+//         onSubmit={handleSubmit}
+//         className="bg-white p-6 rounded shadow-md w-full max-w-md"
+//       >
+//         <h1 className="text-2xl font-bold mb-4">Login</h1>
+//         <Input
+//           type="text"
+//           name="rollNumber"
+//           placeholder="Roll Number"
+//           value={formData.rollNumber}
+//           onChange={handleChange}
+//           required
+//           className="mb-4"
+//         />
+//         <Input
+//           type="password"
+//           name="password"
+//           placeholder="Password"
+//           value={formData.password}
+//           onChange={handleChange}
+//           required
+//           className="mb-4"
+//         />
+//         <Button type="submit" disabled={loading}>
+//           {loading ? "Logging in..." : "Login"}
+//         </Button>
+//       </form>
+//     </div>
+//   );
+// }
 
 // "use client";
 
@@ -212,7 +320,7 @@ export function Auth() {
 // // interface SignupFormData {
 // //   name: string;
 // //   staffId?: string;
-// //   roll_no?: string;
+// //   rollNumber?: string;
 // //   password: string;
 // //   role: string;
 // //   gender: string;
@@ -240,7 +348,7 @@ export function Auth() {
 // //   const [signupData, setSignupData] = useState<SignupFormData>({
 // //     name: "",
 // //     staffId: "",
-// //     roll_no: "",
+// //     rollNumber: "",
 // //     password: "",
 // //     role: "student",
 // //     gender: "",
@@ -374,9 +482,9 @@ export function Auth() {
 // //             />
 // //             <Input
 // //               type="text"
-// //               name="roll_no"
+// //               name="rollNumber"
 // //               placeholder="Roll Number (If Student)"
-// //               value={signupData.roll_no}
+// //               value={signupData.rollNumber}
 // //               onChange={handleSignupChange}
 // //             />
 

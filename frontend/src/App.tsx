@@ -1,9 +1,27 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import react from "react";
 import Appointment from "./pages/appointment/Appointment";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { Auth } from "./pages/Auth/Login";
 // import PastReports from "./pages/PastReports";
-import { UserProvider } from "./store/userContext";
+import { UserProvider, useUser } from "./store/userContext";
+
+// ProtectedRoute component
+function ProtectedRoute({ children }: { children: any }) {
+  const { user } = useUser(); // fetch user from context
+
+  if (!user) {
+    // if no user, redirect to login
+    return <Navigate to="/auth" replace />;
+  }
+
+  return children;
+}
 
 function App() {
   return (
@@ -11,7 +29,25 @@ function App() {
       <Router>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<Dashboard />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/appointment"
+            element={
+              <ProtectedRoute>
+                <Appointment />
+              </ProtectedRoute>
+            }
+          />
+          {/* <Route path="/past-reports" element={<ProtectedRoute>
+                <PastReports />
+              </ProtectedRoute>} /> */}
         </Routes>
       </Router>
     </UserProvider>

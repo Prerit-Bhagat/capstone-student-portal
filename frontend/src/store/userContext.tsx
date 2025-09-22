@@ -9,7 +9,7 @@
 //   dob?: Date;
 //   addr?: string;
 //   role?: string;
-//   roll_no: string;
+//   rollNumber: string;
 //   hostel?: string;
 //   year?: string;
 //   room_no?: string;
@@ -28,7 +28,7 @@
 //     mobile_no: "",
 //     dob: new Date(),
 //     addr: "",
-//     roll_no: "",
+//     rollNumber: "",
 //     role: "student",
 //     hostel: "",
 //     year: "",
@@ -55,7 +55,7 @@ interface Student {
   dob?: Date;
   addr?: string;
   role?: string;
-  roll_no: string;
+  rollNumber: string;
   hostel?: string;
   year?: string;
   room_no?: string;
@@ -66,12 +66,6 @@ type UserContextType = {
   user: Student | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (
-    name: string,
-    email: string,
-    password: string,
-    avatar?: File
-  ) => Promise<void>;
   logout: () => void;
 };
 
@@ -85,38 +79,10 @@ function UserProvider({ children }: { children: ReactNode }) {
     getUser();
   }, []);
 
-  const login = async (roll_no: string, password: string) => {
+  const login = async (rollNumber: string, password: string) => {
     setLoading(true);
     try {
-      await api.post("/api/auth/login", { roll_no, password });
-      await getUser();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signup = async (
-    name: string,
-    email: string,
-    password: string,
-    avatar?: File
-  ) => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("password", password);
-
-      if (avatar) {
-        formData.append("avatar", avatar);
-      }
-
-      await api.post("/api/auth/register", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await api.post("/api/auth/login", { rollNumber, password });
       await getUser();
     } catch (err) {
       console.error(err);
@@ -152,7 +118,7 @@ function UserProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, loading, login, signup, logout }}>
+    <UserContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </UserContext.Provider>
   );
