@@ -16,7 +16,6 @@ const checkAuth = (req: Request, res: Response) => {
 };
 
 const login = tryCatch(async (req: Request, res: Response) => {
-  console.log(req.body);
   const rollNumber: string = req.body.rollNumber;
   const password: string = req.body.password;
 
@@ -35,13 +34,12 @@ const login = tryCatch(async (req: Request, res: Response) => {
   return res.status(200).json({ message: `Welcome ${student.name} !` });
 });
 
-// Get currently logged-in student
-const getUser = tryCatch(async (req: RequestWithStudent, res: Response) => {
-  const studentId = req.studentId;
-  if (!studentId) throw new ErrorHandler(401, "Unauthorized!");
+const getLoggedInUser = tryCatch(async (req: RequestWithStudent, res: Response) => {
+  const { studentId } = req;
+  if (!studentId) throw new ErrorHandler(401, "Unauthorized, login required !");
 
-  const student: IStudent | null = await StudentModel.findById(studentId).select("+password");
-  if (!student) throw new ErrorHandler(404, "Student not found!");
+  const student: IStudent | null = await StudentModel.findById(studentId);
+  if (!student) throw new ErrorHandler(404, "Student not found !");
 
   return res.status(200).json(student);
 });
@@ -74,4 +72,4 @@ const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) =
   return res.status(200).json({ message: "Password updated successfully !" });
 });
 
-export { checkAuth, login, updatePassword, getUser };
+export { checkAuth, login, updatePassword, getLoggedInUser };
