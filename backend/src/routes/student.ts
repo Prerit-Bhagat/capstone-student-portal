@@ -1,8 +1,9 @@
 import express from "express";
-import { getAllStudents } from "@/controllers/student.js";
+import { isLoggedIn } from "@/middlewares/auth.js";
+import { updatePassword } from "@/controllers/student.js";
 
 const router = express.Router();
 
-router.get("/all", getAllStudents);
+router.post("/update-password", isLoggedIn, updatePassword);
 
 export { router as studentRouter };

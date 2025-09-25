@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 export class ErrorHandler extends Error {
   constructor(public statusCode: number, public message: string) {
@@ -7,7 +7,13 @@ export class ErrorHandler extends Error {
   }
 }
 
-export const errorHandler = (err: ErrorHandler, _req: Request, res: Response) => {
+export const errorHandler = (
+  err: ErrorHandler,
+  _req: Request,
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: NextFunction
+) => {
   err.statusCode ||= 500;
   err.message ||= "Internal Server Error";
 

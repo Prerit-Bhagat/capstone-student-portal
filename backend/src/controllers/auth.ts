@@ -7,6 +7,7 @@ import { generateToken } from "@/utils/generate-token.js";
 import { getDefaultPassword } from "@/utils/default-password.js";
 import { type RequestWithStudent } from "@/types/request.js";
 import { type IStudent } from "@/types/types.js";
+import { cookieOptions } from "@/constants/cookie-options";
 
 const checkAuth = (req: Request, res: Response) => {
   const token = req.cookies?.token;
@@ -34,6 +35,13 @@ const login = tryCatch(async (req: Request, res: Response) => {
   return res.status(200).json({ message: `Welcome ${student.name} !` });
 });
 
+const logout = (_req: Request, res: Response) => {
+  res
+    .status(200)
+    .cookie("token", "", { ...cookieOptions, expires: new Date(Date.now()) })
+    .json({ message: "Logged out successfully !" });
+};
+
 const getLoggedInStudent = tryCatch(async (req: RequestWithStudent, res: Response) => {
   const { studentId } = req;
   if (!studentId) throw new ErrorHandler(401, "Unauthorized, login required !");
@@ -44,32 +52,4 @@ const getLoggedInStudent = tryCatch(async (req: RequestWithStudent, res: Respons
   return res.status(200).json(student);
 });
 
-const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) => {
-  const oldPassword: string = req.body.oldPassword;
-  if (!oldPassword) throw new ErrorHandler(400, "Current password is required !");
-  const newPassword: string = req.body.newPassword;
-  if (!newPassword) throw new ErrorHandler(400, "New password cannot be empty !");
-  if (oldPassword === newPassword)
-    throw new ErrorHandler(400, "Current and New password cannot be same !");
-
-  const studentId = req.studentId;
-  if (!studentId) throw new ErrorHandler(401, "Unauthorized !");
-  const student: IStudent = await StudentModel.findById(studentId).select("+password");
-  if (!student) throw new ErrorHandler(404, "Student not found !");
-
-  let matchOldPassword = false;
-  if (student.isPasswordDefault) matchOldPassword = oldPassword === getDefaultPassword(student);
-  else matchOldPassword = await bcrypt.compare(oldPassword, student.password);
-
-  if (!matchOldPassword) throw new ErrorHandler(401, "Current password is incorrect !");
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await StudentModel.findByIdAndUpdate(studentId, {
-    password: hashedPassword,
-    isPasswordDefault: false,
-  });
-
-  return res.status(200).json({ message: "Password updated successfully !" });
-});
-
-export { checkAuth, login, updatePassword, getLoggedInStudent };
+export { checkAuth, login, logout, getLoggedInStudent };
