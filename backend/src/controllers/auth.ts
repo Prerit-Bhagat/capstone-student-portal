@@ -34,7 +34,7 @@ const login = tryCatch(async (req: Request, res: Response) => {
   return res.status(200).json({ message: `Welcome ${student.name} !` });
 });
 
-const getLoggedInUser = tryCatch(async (req: RequestWithStudent, res: Response) => {
+const getLoggedInStudent = tryCatch(async (req: RequestWithStudent, res: Response) => {
   const { studentId } = req;
   if (!studentId) throw new ErrorHandler(401, "Unauthorized, login required !");
 
@@ -72,4 +72,4 @@ const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) =
   return res.status(200).json({ message: "Password updated successfully !" });
 });
 
-export { checkAuth, login, updatePassword, getLoggedInUser };
+export { checkAuth, login, updatePassword, getLoggedInStudent };

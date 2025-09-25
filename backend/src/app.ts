@@ -8,7 +8,7 @@ import { authRouter } from "@/routes/auth.js";
 import { studentRouter } from "@/routes/student.js";
 
 const app = express();
-dotenv.config({ path: ".env" });
+dotenv.config({ path: ".env", quiet: true });
 await connectDB();
 
 app.use(
