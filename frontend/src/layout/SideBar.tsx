@@ -265,7 +265,7 @@ const allLinks = [
         logo: <LayoutDashboard className="mr-3 h-5 w-5" />,
       },
       {
-        name: "Attendance",
+        name: "Appointment",
         href: "/appointment",
         logo: <FileText className="mr-3 h-5 w-5" />,
       },
@@ -296,7 +296,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       logo: <LayoutDashboard className="mr-3 h-5 w-5" />,
     },
     {
-      name: "Attendance",
+      name: "Appointment",
       href: "/appointment",
       logo: <FileText className="mr-3 h-5 w-5" />,
     },
