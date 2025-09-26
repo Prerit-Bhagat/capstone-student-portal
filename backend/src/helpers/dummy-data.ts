@@ -13,7 +13,7 @@ const addDummyStudent = async () => {
     department: "COE",
     hostel: "M",
     roomNumber: "C-204",
-    yearOfStudy: 4,
+    yearOfStudy: 7,
     emergencyContact: "7087394178",
     bloodGroup: "O_POS",
   });

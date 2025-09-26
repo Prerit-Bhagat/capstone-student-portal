@@ -8,7 +8,10 @@ import {
 } from "../../components/ui/collapsible";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { useState } from "react";
-import Access from "../../common/access";
+import React, { useEffect } from "react";
+import { User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../store/userContext";
 
 export default function AppointmentPage() {
   const [doctorsExpanded, setDoctorsExpanded] = useState(true);
@@ -87,6 +90,15 @@ export default function AppointmentPage() {
       setLoading(false);
     }
   };
+
+  const { user, logout } = useUser();
+  const navigate = useNavigate();
+  // Redirect to login if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+    }
+  }, [user, navigate]);
 
   return (
     <DashboardLayout title="Appointment">
