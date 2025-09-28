@@ -1,4 +1,4 @@
-import { DoctorModel } from "@/models/doctor";
+import { DoctorModel } from "@/models/doctor.js";
 import { StudentModel } from "@/models/student.js";
 
 const addDummyStudent = async () => {
@@ -13,7 +13,7 @@ const addDummyStudent = async () => {
     department: "COE",
     hostel: "M",
     roomNumber: "C-204",
-    yearOfStudy: 7,
+    yearOfStudy: 4,
     emergencyContact: "7087394178",
     bloodGroup: "O_POS",
   });
