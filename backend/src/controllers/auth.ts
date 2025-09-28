@@ -7,7 +7,7 @@ import { generateToken } from "@/utils/generate-token.js";
 import { getDefaultPassword } from "@/utils/default-password.js";
 import { type RequestWithStudent } from "@/types/request.js";
 import { type IStudent } from "@/types/types.js";
-import { cookieOptions } from "@/constants/cookie-options";
+import { cookieOptions } from "@/constants/cookie-options.js";
 
 const checkAuth = (req: Request, res: Response) => {
   const token = req.cookies?.token;
