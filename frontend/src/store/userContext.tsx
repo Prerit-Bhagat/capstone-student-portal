@@ -54,10 +54,11 @@ interface Student {
   mobile_no: string;
   dob?: Date;
   addr?: string;
-  role?: string;
   rollNumber: string;
   hostel?: string;
-  year?: string;
+  yearOfStudy?: string;
+  bloodGroup?: string;
+  emergencyContact?: string;
   room_no?: string;
   department?: string;
 }
@@ -94,7 +95,7 @@ function UserProvider({ children }: { children: ReactNode }) {
   const getUser = async (): Promise<void> => {
     setLoading(true);
     try {
-      const res = await api.get<Student>("/api/auth/get-user");
+      const res = await api.get<Student>("/api/auth/get-student");
       setUser(res.data);
     } catch (err) {
       console.error(err);

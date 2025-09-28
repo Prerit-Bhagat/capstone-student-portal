@@ -265,7 +265,7 @@ const allLinks = [
         logo: <LayoutDashboard className="mr-3 h-5 w-5" />,
       },
       {
-        name: "Attendance",
+        name: "Appointment",
         href: "/appointment",
         logo: <FileText className="mr-3 h-5 w-5" />,
       },
@@ -289,7 +289,23 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
 
   if (!user) return null; // hide sidebar if not logged in
 
-  const links = allLinks.find((l) => l.role === user.role)?.links || [];
+  const allLinks = [
+    {
+      name: "Dashboard",
+      href: "/",
+      logo: <LayoutDashboard className="mr-3 h-5 w-5" />,
+    },
+    {
+      name: "Appointment",
+      href: "/appointment",
+      logo: <FileText className="mr-3 h-5 w-5" />,
+    },
+    {
+      name: "Past-Reports",
+      href: "/past-reports",
+      logo: <FileText className="mr-3 h-5 w-5" />,
+    },
+  ];
 
   const handleLogout = async () => {
     await logout();
@@ -323,7 +339,7 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       {/* Navigation */}
       <div className="px-4">
         <nav className="space-y-2">
-          {links.map((item) => {
+          {allLinks.map((item) => {
             const isActive = window.location.pathname === item.href;
             return (
               <Link
@@ -358,3 +374,101 @@ export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
     </div>
   );
 }
+
+// export function Sidebar({ isOpen = true, onClose }: SidebarProps) {
+//   const navigate = useNavigate();
+//   const { user, logout } = useUser();
+
+//   if (!user) return null; // hide sidebar if not logged in
+
+//   // const links = allLinks.find((l) => l.role === user.role)?.links || [];
+//   const allLinks = [
+//     {
+//       role: "student",
+//       links: [
+//         {
+//           name: "Dashboard",
+//           href: "/dashboard",
+//           logo: <LayoutDashboard className="mr-3 h-5 w-5" />,
+//         },
+//         {
+//           name: "Attendance",
+//           href: "/appointment",
+//           logo: <FileText className="mr-3 h-5 w-5" />,
+//         },
+//         {
+//           name: "Past-Reports",
+//           href: "/past-reports",
+//           logo: <FileText className="mr-3 h-5 w-5" />,
+//         },
+//       ],
+//     },
+//   ];
+
+//   const handleLogout = async () => {
+//     await logout();
+//     navigate("/auth");
+//   };
+
+//   return (
+//     <div
+//       className={cn(
+//         "flex h-full w-80 flex-col bg-gray-800 text-white transition-transform duration-300 ease-in-out z-50",
+//         "fixed md:relative",
+//         isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+//       )}
+//     >
+//       {/* Logo */}
+//       <div className="flex items-center justify-between px-4 md:px-6 py-4 md:py-6">
+//         <div className="flex items-center gap-2">
+//           <div className="flex h-8 w-8 items-center justify-center rounded-md">
+//             <Heart className="h-5 w-5 text-white" />
+//           </div>
+//           <span className="text-lg md:text-xl font-bold">TIET MediHub</span>
+//         </div>
+//         <button
+//           onClick={onClose}
+//           className="md:hidden p-2 hover:bg-gray-700 rounded-md"
+//         >
+//           <X className="h-5 w-5" />
+//         </button>
+//       </div>
+
+//       {/* Navigation */}
+//       <div className="px-4">
+//         <nav className="space-y-2">
+//           {allinks.map((item) => {
+//             const isActive = window.location.pathname === item.href;
+//             return (
+//               <Link
+//                 key={item.name}
+//                 to={item.href}
+//                 onClick={onClose}
+//                 className={cn(
+//                   "flex w-full items-center gap-3 rounded-md px-3 py-2",
+//                   isActive
+//                     ? "bg-blue-600 text-white"
+//                     : "text-gray-300 hover:bg-gray-700"
+//                 )}
+//               >
+//                 {item.logo}
+//                 {item.name}
+//               </Link>
+//             );
+//           })}
+//         </nav>
+//       </div>
+
+//       {/* Logout */}
+//       <div className="mt-auto px-4 pb-4">
+//         <button
+//           onClick={handleLogout}
+//           className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-300 hover:bg-gray-700"
+//         >
+//           <LogOut className="h-5 w-5" />
+//           Log out
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }

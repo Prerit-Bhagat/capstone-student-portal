@@ -8,15 +8,18 @@ import react from "react";
 import Appointment from "./pages/appointment/Appointment";
 import Dashboard from "./pages/dashboard/Dashboard";
 import { Auth } from "./pages/Auth/Login";
-// import PastReports from "./pages/PastReports";
+import PastReports from "./pages/past-reports/PastReports";
 import { UserProvider, useUser } from "./store/userContext";
 
 // ProtectedRoute component
 function ProtectedRoute({ children }: { children: any }) {
-  const { user } = useUser(); // fetch user from context
+  const { user, loading } = useUser();
+
+  if (loading) {
+    return <div>Loading...</div>; // or spinner
+  }
 
   if (!user) {
-    // if no user, redirect to login
     return <Navigate to="/auth" replace />;
   }
 
@@ -45,9 +48,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="/past-reports" element={<ProtectedRoute>
+          <Route
+            path="/past-reports"
+            element={
+              <ProtectedRoute>
                 <PastReports />
-              </ProtectedRoute>} /> */}
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </UserProvider>
