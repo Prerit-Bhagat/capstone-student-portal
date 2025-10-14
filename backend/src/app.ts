@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from "express";
-import dotenv from "dotenv";
+import { configDotenv } from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "@/middlewares/error-handler.js";
@@ -8,7 +8,7 @@ import { authRouter } from "@/routes/auth.js";
 import { studentRouter } from "@/routes/student.js";
 
 const app = express();
-dotenv.config({ path: ".env", quiet: true });
+configDotenv({ path: ".env", quiet: true });
 await connectDB();
 
 app.use(
