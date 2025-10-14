@@ -9,7 +9,7 @@ import { type RequestWithStudent } from "@/types/request.js";
 import { type IStudent } from "@/types/types.js";
 import { cookieOptions } from "@/constants/cookie-options.js";
 
-const checkAuth = (req: Request, res: Response) => {
+const checkToken = (req: Request, res: Response) => {
   const token = req.cookies?.token;
 
   if (!token) return res.status(401).json({ isLoggedIn: false });
@@ -52,4 +52,4 @@ const getLoggedInStudent = tryCatch(async (req: RequestWithStudent, res: Respons
   return res.status(200).json(student);
 });
 
-export { checkAuth, login, logout, getLoggedInStudent };
+export { checkToken, login, logout, getLoggedInStudent };
