@@ -1,6 +1,7 @@
 import express, { type Request, type Response } from "express";
 import { configDotenv } from "dotenv";
 import cors from "cors";
+import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { errorHandler } from "@/middlewares/error-handler.js";
 import { connectDB } from "@/config/db.js";
@@ -19,6 +20,7 @@ app.use(
   })
 );
 
+app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
