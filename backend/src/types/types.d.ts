@@ -1,8 +1,8 @@
 import { Document, Types } from "mongoose";
 
-type Gender = "MALE" | "FEMALE" | "OTHER";
-type AppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
-type BloodGroup = "A_POS" | "A_NEG" | "B_POS" | "B_NEG" | "AB_POS" | "AB_NEG" | "O_POS" | "O_NEG";
+type IGender = "MALE" | "FEMALE" | "OTHER";
+type IAppointmentStatus = "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
+type IBloodGroup = "A_POS" | "A_NEG" | "B_POS" | "B_NEG" | "AB_POS" | "AB_NEG" | "O_POS" | "O_NEG";
 
 interface IStudent extends Document {
   _id: Types.ObjectId;
