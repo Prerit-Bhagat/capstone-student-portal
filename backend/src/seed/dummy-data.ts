@@ -1,6 +1,6 @@
 import { DoctorModel } from "@/models/doctor.js";
 import { StudentModel } from "@/models/student.js";
-import type { IBloodGroup, IGender } from "@/types/types.js";
+import { IBloodGroup, IGender } from "@/types/types.js";
 
 const addDummyStudent = async () => {
   const student = await StudentModel.create({
@@ -9,14 +9,14 @@ const addDummyStudent = async () => {
     email: "rbhagat_be22@thapar.edu",
     password: "RaghavBhagat@06042004",
     phone: "7087394178",
-    gender: "MALE" as IGender,
+    gender: IGender.MALE,
     dob: new Date("2004-04-06"),
     department: "COE",
     hostel: "M",
     roomNumber: "C-204",
     yearOfStudy: 4,
     emergencyContact: "7087394178",
-    bloodGroup: "O_POS" as IBloodGroup,
+    bloodGroup: IBloodGroup.O_POS,
   });
 
   console.log("Dummy student added:", student);
@@ -27,7 +27,7 @@ const addDummyDoctor = async () => {
     name: "Dr. Zulfikar Qureshi",
     email: "zulfikar.qureshi@thapar.edu",
     phone: "9876543210",
-    gender: "MALE" as IGender,
+    gender: IGender.MALE,
     specialization: "General Physician",
     designation: "Senior Medical Officer",
   });
