@@ -6,10 +6,6 @@ const availabilitySchema = new mongoose.Schema({
     ref: "Doctor",
     required: true,
   },
-  dayOfWeek: {
-    type: Number,
-    required: true,
-  },
   startTime: {
     type: Date,
     required: true,

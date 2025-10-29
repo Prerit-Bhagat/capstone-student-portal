@@ -7,6 +7,9 @@ import { errorHandler } from "@/middlewares/error-handler.js";
 import { connectDB } from "@/config/db.js";
 import { authRouter } from "@/routes/auth.js";
 import { studentRouter } from "@/routes/student.js";
+import { doctorRouter } from "@/routes/doctor.js";
+import { appointmentRouter } from "@/routes/appointment.js";
+import { availabilityRouter } from "@/routes/availability.js";
 
 const app = express();
 configDotenv({ path: ".env", quiet: true });
@@ -31,6 +34,9 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/student", studentRouter);
+app.use("/api/doctor", doctorRouter);
+app.use("/api/appointment", appointmentRouter);
+app.use("/api/availability", availabilityRouter);
 
 app.use(errorHandler);
 

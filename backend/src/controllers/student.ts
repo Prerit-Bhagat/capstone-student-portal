@@ -6,6 +6,7 @@ import { StudentModel } from "@/models/student.js";
 import { IStudent } from "@/types/types.js";
 import { ErrorHandler } from "@/middlewares/error-handler.js";
 import { getDefaultPassword } from "@/utils/default-password.js";
+import { AppointmentModel } from "@/models/appointment.js";
 
 const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) => {
   const oldPassword: string = req.body.oldPassword;
@@ -35,4 +36,15 @@ const updatePassword = tryCatch(async (req: RequestWithStudent, res: Response) =
   return res.status(200).json({ message: "Password updated successfully !" });
 });
 
-export { updatePassword };
+const getStudentAppointments = tryCatch(async (req: RequestWithStudent, res: Response) => {
+  const { studentId } = req;
+  if (!studentId) throw new ErrorHandler(401, "Unauthorized, login required !");
+
+  const appointments = await AppointmentModel.find({ studentId })
+    .populate("doctorId", "name email phone specialization")
+    .sort({ appointmentDate: -1 });
+
+  return res.status(200).json(appointments);
+});
+
+export { updatePassword, getStudentAppointments };
