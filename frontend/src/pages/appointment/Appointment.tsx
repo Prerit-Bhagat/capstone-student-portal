@@ -1,6 +1,5 @@
 import { DashboardLayout } from "../../layout/AppLayout";
 import { Card, CardContent } from "../../components/ui/card";
-import Button from "../../components/ui/Button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -11,6 +10,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../store/userContext";
 import Calendar from "../../components/ui/calendar";
+import { api } from "../../utils/axios";
 
 export default function AppointmentPage() {
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -30,18 +30,12 @@ export default function AppointmentPage() {
   }, [user]);
 
   useEffect(() => {
-    setDoctors([
-      {
-        id: "68ed964eea8f55dc0ad7a93e",
-        name: "Dr. Aman Arora",
-        specialization: "General Medicine",
-      },
-      {
-        id: "68ed964eea8f55dc0ad7a93f",
-        name: "Dr. Suman Sharma",
-        specialization: "General Medicine",
-      },
-    ]);
+    const fetchAllDoctors = async () => {
+      const res = await api.get("/api/doctor/get-all-doctors");
+      setDoctors(res.data as any[]);
+    };
+
+    fetchAllDoctors();
   }, []);
 
   useEffect(() => {
