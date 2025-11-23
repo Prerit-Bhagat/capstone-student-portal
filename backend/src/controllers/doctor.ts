@@ -1,8 +1,14 @@
 import type { Request, Response } from "express";
 import { tryCatch } from "@/utils/try-catch.js";
 import { ErrorHandler } from "@/middlewares/error-handler.js";
+import { DoctorModel } from "@/models/doctor.js";
 import { AppointmentModel } from "@/models/appointment.js";
 import { validateId } from "@/utils/validate-id.js";
+
+const getAllDoctors = tryCatch(async (_req: Request, res: Response) => {
+  const doctors = await DoctorModel.find({});
+  return res.status(200).json(doctors);
+});
 
 const getDoctorAppointments = tryCatch(async (req: Request, res: Response) => {
   const { doctorId } = req.params;
@@ -15,4 +21,4 @@ const getDoctorAppointments = tryCatch(async (req: Request, res: Response) => {
   return res.status(200).json(appointments);
 });
 
-export { getDoctorAppointments };
+export { getAllDoctors, getDoctorAppointments };
