@@ -25,52 +25,53 @@ export default function AppointmentPage() {
   const { user } = useUser();
   const navigate = useNavigate();
 
+  // Redirect if no user
   useEffect(() => {
     if (!user) navigate("/auth");
   }, [user]);
 
+  // Fetch doctors
   useEffect(() => {
-    const fetchAllDoctors = async () => {
+    const fetchDoctors = async () => {
       const res = await api.get("/api/doctor/get-all-doctors");
-      setDoctors(res.data as any[]);
+      setDoctors(res.data);
     };
-
-    fetchAllDoctors();
+    fetchDoctors();
   }, []);
 
+  // Fetch doctor availability
   useEffect(() => {
     if (!selectedDoctor) return;
 
-    fetch(
-      `${
-        import.meta.env.VITE_SERVER_URL
-      }/api/availability/get-availability/${selectedDoctor}`,
-      { credentials: "include" }
-    )
-      .then((res) => res.json())
-      .then((data) => setAvailability(data))
-      .catch((err) => console.error(err));
+    const fetchAvailability = async () => {
+      try {
+        const res = await api.get(
+          `/api/availability/get-availability/${selectedDoctor}`
+        );
+        setAvailability(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchAvailability();
   }, [selectedDoctor]);
 
-  const generateSlots = (start: string, end: string) => {
+  // Generate 30-minute slots between two Date objects
+  const generateSlots = (start: Date, end: Date) => {
     const slots = [];
     let current = new Date(start);
-    const finish = new Date(end);
 
-    while (current < finish) {
+    while (current < end) {
       const next = new Date(current.getTime() + 30 * 60000);
-
-      slots.push({
-        start: new Date(current),
-        end: new Date(next),
-      });
-
+      slots.push({ start: new Date(current), end: new Date(next) });
       current = next;
     }
 
     return slots;
   };
 
+  // Book appointments
   const handleBook = async () => {
     if (!selectedDoctor || selectedDates.length === 0) {
       alert("Please select doctor and at least one date.");
@@ -100,21 +101,10 @@ export default function AppointmentPage() {
         };
       });
 
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_SERVER_URL
-        }/api/appointment/book-appointment/bulk`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ appointments: payload }),
-        }
+      const response = await api.post(
+        "/api/appointment/book-appointment/bulk",
+        { appointments: payload }
       );
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message);
 
       alert("All appointments booked successfully!");
 
@@ -122,8 +112,7 @@ export default function AppointmentPage() {
       setSelectedSlots({});
       setReason("");
     } catch (err: any) {
-      console.error(err);
-      alert(err.message || "Error booking appointments");
+      alert(err.response?.data?.message || "Error booking appointments");
     } finally {
       setLoading(false);
     }
@@ -131,79 +120,72 @@ export default function AppointmentPage() {
 
   return (
     <DashboardLayout title="Appointment">
-      <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
-        {/* Doctors List */}
-        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+      <div className="space-y-6 px-2 sm:px-0">
+        {/* Doctor List */}
+        <Card className="border shadow-sm hover:shadow-md">
           <Collapsible defaultOpen>
-            <CollapsibleTrigger className="flex justify-between items-center p-4 sm:p-6 w-full hover:bg-gray-50 transition-colors">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">
-                Select Doctor
-              </h2>
-              <ChevronDown className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
+            <CollapsibleTrigger className="flex justify-between items-center p-6 w-full hover:bg-gray-50">
+              <h2 className="text-lg font-bold">Select Doctor</h2>
+              <ChevronDown className="w-5 h-5 text-gray-600" />
             </CollapsibleTrigger>
 
             <CollapsibleContent>
-              <CardContent className="pt-0 px-4 sm:px-6 pb-4 sm:pb-6">
-                <div className="space-y-2 sm:space-y-3">
-                  {doctors.map((doc) => (
-                    <div
-                      key={doc.id}
-                      onClick={() => {
-                        setSelectedDoctor(doc.id);
-                        setSelectedDates([]);
-                        setSelectedSlots({});
-                      }}
-                      className={`p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                        selectedDoctor === doc.id
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            {selectedDoctor === doc.id && (
-                              <CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 flex-shrink-0" />
-                            )}
-                            <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
-                              {doc.name}
-                            </h3>
-                          </div>
-                          <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                            {doc.specialization}
-                          </p>
+              <CardContent className="px-6 pb-6 space-y-3">
+                {doctors.map((doc) => (
+                  <div
+                    key={doc._id}
+                    onClick={() => {
+                      setSelectedDoctor(doc._id);
+                      setSelectedDates([]);
+                      setSelectedSlots({});
+                    }}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                      selectedDoctor === doc._id
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-gray-200 bg-white hover:border-blue-300"
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          {selectedDoctor === doc._id && (
+                            <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                          )}
+                          <h3 className="font-semibold">{doc.name}</h3>
                         </div>
-                        <div
-                          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-xs sm:text-sm transition-colors whitespace-nowrap ${
-                            selectedDoctor === doc.id
-                              ? "bg-blue-600 text-white"
-                              : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-600"
-                          }`}
-                        >
-                          {selectedDoctor === doc.id ? "Selected" : "Select"}
-                        </div>
+                        <p className="text-gray-600 text-sm">
+                          {doc.specialization}
+                        </p>
+                      </div>
+
+                      <div
+                        className={`px-4 py-2 rounded-full text-sm font-medium ${
+                          selectedDoctor === doc._id
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {selectedDoctor === doc._id ? "Selected" : "Select"}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </CardContent>
             </CollapsibleContent>
           </Collapsible>
         </Card>
 
-        {/* Calendar + slots */}
+        {/* Calendar + Slots */}
         {selectedDoctor && (
-          <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <Card className="border shadow-sm hover:shadow-md">
             <Collapsible defaultOpen>
-              <CollapsibleTrigger className="flex justify-between items-center p-4 sm:p-6 w-full hover:bg-gray-50 transition-colors">
-                <h2 className="text-base sm:text-lg font-bold text-gray-900">
-                  Select Dates & Times
-                </h2>
-                <ChevronDown className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
+              <CollapsibleTrigger className="flex justify-between items-center p-6 w-full hover:bg-gray-50">
+                <h2 className="text-lg font-bold">Select Dates & Times</h2>
+                <ChevronDown className="w-5 h-5 text-gray-600" />
               </CollapsibleTrigger>
 
               <CollapsibleContent>
-                <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
+                <CardContent className="px-6 pb-6 space-y-6">
                   {/* Calendar */}
                   <Calendar
                     selectedDates={selectedDates}
@@ -211,40 +193,45 @@ export default function AppointmentPage() {
                     maxSelections={3}
                   />
 
-                  {/* For each selected date → show slot buttons */}
+                  {/* Time slots for each selected date */}
                   {selectedDates.map((date) => {
                     const key = date.toDateString();
 
-                    const filtered = availability.filter((a) => {
-                      const d = new Date(a.startTime);
-                      return d.toDateString() === date.toDateString();
-                    });
+                    const filtered = availability.filter(
+                      (a) =>
+                        new Date(a.startTime).toDateString() ===
+                        date.toDateString()
+                    );
 
                     return (
                       <div
                         key={key}
-                        className="border border-gray-200 p-3 sm:p-6 rounded-lg bg-gray-50"
+                        className="border p-4 bg-gray-50 rounded-lg"
                       >
-                        <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-3 sm:mb-4">
-                          📅 Time slots for {date.toDateString()}
+                        <h3 className="font-bold mb-4">
+                          Time slots for {date.toDateString()}
                         </h3>
 
                         {filtered.length === 0 ? (
-                          <p className="text-gray-500 text-xs sm:text-sm">
+                          <p className="text-gray-500 text-sm">
                             No availability for this date.
                           </p>
                         ) : (
-                          filtered.map((a) => {
-                            const slots = generateSlots(a.startTime, a.endTime);
+                          filtered.map((slotRec) => {
+                            const slots = generateSlots(
+                              new Date(slotRec.startTime),
+                              new Date(slotRec.endTime)
+                            );
 
                             return (
                               <div
-                                key={a._id}
-                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3"
+                                key={slotRec._id}
+                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"
                               >
                                 {slots.map((slot, idx) => {
                                   const isSelected =
-                                    selectedSlots[key] === slot;
+                                    selectedSlots[key]?.start?.getTime() ===
+                                    slot.start.getTime();
 
                                   return (
                                     <button
@@ -255,10 +242,10 @@ export default function AppointmentPage() {
                                           [key]: slot,
                                         }))
                                       }
-                                      className={`py-2 px-2 rounded-lg font-medium text-xs transition-all duration-200 transform hover:scale-105 ${
+                                      className={`py-2 px-3 rounded-lg text-xs font-medium transition ${
                                         isSelected
-                                          ? "bg-blue-600 text-white shadow-md scale-105"
-                                          : "bg-white text-gray-700 border border-gray-200 hover:border-blue-400 hover:text-blue-600"
+                                          ? "bg-blue-600 text-white shadow"
+                                          : "bg-white border border-gray-300 hover:border-blue-400"
                                       }`}
                                     >
                                       {slot.start.toLocaleTimeString([], {
@@ -278,16 +265,16 @@ export default function AppointmentPage() {
 
                   {/* Reason */}
                   <div>
-                    <label className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2">
+                    <label className="font-semibold text-sm block mb-2">
                       Reason for Visit
                     </label>
                     <textarea
-                      className="w-full border border-gray-300 p-2 sm:p-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                      placeholder="Please describe the reason for your appointment..."
+                      className="w-full border p-3 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                      rows={3}
+                      placeholder="Describe your issue..."
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
-                      rows={3}
-                    />
+                    ></textarea>
                   </div>
                 </CardContent>
               </CollapsibleContent>
@@ -296,30 +283,346 @@ export default function AppointmentPage() {
         )}
 
         {/* Book Button */}
-        <div className="flex justify-end pt-2 sm:pt-4 px-4 sm:px-0">
+        <div className="flex justify-end">
           <button
-            disabled={loading || selectedDates.length === 0}
             onClick={handleBook}
-            className={`w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base text-white transition-all duration-200 transform ${
+            disabled={loading || selectedDates.length === 0}
+            className={`px-8 py-3 rounded-lg text-white font-semibold transition ${
               loading || selectedDates.length === 0
-                ? "bg-gray-400 cursor-not-allowed opacity-60"
-                : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:scale-105 active:scale-95"
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="inline-block animate-spin">⏳</span>
-                Booking...
-              </span>
-            ) : (
-              "Book Appointment"
-            )}
+            {loading ? "Booking..." : "Book Appointment"}
           </button>
         </div>
       </div>
     </DashboardLayout>
   );
 }
+
+// import { DashboardLayout } from "../../layout/AppLayout";
+// import { Card, CardContent } from "../../components/ui/card";
+// import {
+//   Collapsible,
+//   CollapsibleContent,
+//   CollapsibleTrigger,
+// } from "../../components/ui/collapsible";
+// import { ChevronDown, CheckCircle2 } from "lucide-react";
+// import { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { useUser } from "../../store/userContext";
+// import Calendar from "../../components/ui/calendar";
+// import { api } from "../../utils/axios";
+
+// export default function AppointmentPage() {
+//   const [doctors, setDoctors] = useState<any[]>([]);
+//   const [selectedDoctor, setSelectedDoctor] = useState<string | null>(null);
+
+//   const [availability, setAvailability] = useState<any[]>([]);
+//   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+//   const [selectedSlots, setSelectedSlots] = useState<any>({});
+//   const [reason, setReason] = useState("");
+
+//   const [loading, setLoading] = useState(false);
+//   const { user } = useUser();
+//   const navigate = useNavigate();
+
+//   useEffect(() => {
+//     if (!user) navigate("/auth");
+//   }, [user]);
+
+//   useEffect(() => {
+//     const fetchAllDoctors = async () => {
+//       const res = await api.get("/api/doctor/get-all-doctors");
+//       setDoctors(res.data as any[]);
+//     };
+
+//     fetchAllDoctors();
+//   }, []);
+
+//   useEffect(() => {
+//     if (!selectedDoctor) return;
+
+//     fetch(
+//       `${
+//         import.meta.env.VITE_SERVER_URL
+//       }/api/availability/get-availability/${selectedDoctor}`,
+//       { credentials: "include" }
+//     )
+//       .then((res) => res.json())
+//       .then((data) => setAvailability(data))
+//       .catch((err) => console.error(err));
+//   }, [selectedDoctor]);
+
+//   const generateSlots = (start: string, end: string) => {
+//     const slots = [];
+//     let current = new Date(start);
+//     const finish = new Date(end);
+
+//     while (current < finish) {
+//       const next = new Date(current.getTime() + 30 * 60000);
+
+//       slots.push({
+//         start: new Date(current),
+//         end: new Date(next),
+//       });
+
+//       current = next;
+//     }
+
+//     return slots;
+//   };
+
+//   const handleBook = async () => {
+//     if (!selectedDoctor || selectedDates.length === 0) {
+//       alert("Please select doctor and at least one date.");
+//       return;
+//     }
+
+//     for (const d of selectedDates) {
+//       const key = d.toDateString();
+//       if (!selectedSlots[key]) {
+//         alert("Please choose a time slot for each selected date.");
+//         return;
+//       }
+//     }
+
+//     setLoading(true);
+
+//     try {
+//       const payload = selectedDates.map((d) => {
+//         const key = d.toDateString();
+//         const slot = selectedSlots[key];
+
+//         return {
+//           doctorId: selectedDoctor,
+//           appointmentStartTime: slot.start.toISOString(),
+//           appointmentEndTime: slot.end.toISOString(),
+//           reason,
+//         };
+//       });
+
+//       const response = await fetch(
+//         `${
+//           import.meta.env.VITE_SERVER_URL
+//         }/api/appointment/book-appointment/bulk`,
+//         {
+//           method: "POST",
+//           credentials: "include",
+//           headers: { "Content-Type": "application/json" },
+//           body: JSON.stringify({ appointments: payload }),
+//         }
+//       );
+
+//       const data = await response.json();
+
+//       if (!response.ok) throw new Error(data.message);
+
+//       alert("All appointments booked successfully!");
+
+//       setSelectedDates([]);
+//       setSelectedSlots({});
+//       setReason("");
+//     } catch (err: any) {
+//       console.error(err);
+//       alert(err.message || "Error booking appointments");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <DashboardLayout title="Appointment">
+//       <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+//         {/* Doctors List */}
+//         <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+//           <Collapsible defaultOpen>
+//             <CollapsibleTrigger className="flex justify-between items-center p-4 sm:p-6 w-full hover:bg-gray-50 transition-colors">
+//               <h2 className="text-base sm:text-lg font-bold text-gray-900">
+//                 Select Doctor
+//               </h2>
+//               <ChevronDown className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
+//             </CollapsibleTrigger>
+
+//             <CollapsibleContent>
+//               <CardContent className="pt-0 px-4 sm:px-6 pb-4 sm:pb-6">
+//                 <div className="space-y-2 sm:space-y-3">
+//                   {doctors.map((doc) => (
+//                     <div
+//                       key={doc.id}
+//                       onClick={() => {
+//                         setSelectedDoctor(doc.id);
+//                         setSelectedDates([]);
+//                         setSelectedSlots({});
+//                       }}
+//                       className={`p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+//                         selectedDoctor === doc.id
+//                           ? "border-blue-500 bg-blue-50"
+//                           : "border-gray-200 bg-white hover:border-blue-300 hover:bg-blue-50"
+//                       }`}
+//                     >
+//                       <div className="flex items-center justify-between gap-2 flex-wrap">
+//                         <div className="flex-1 min-w-0">
+//                           <div className="flex items-center gap-2 flex-wrap">
+//                             {selectedDoctor === doc.id && (
+//                               <CheckCircle2 className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 flex-shrink-0" />
+//                             )}
+//                             <h3 className="font-semibold text-sm sm:text-base text-gray-900 truncate">
+//                               {doc.name}
+//                             </h3>
+//                           </div>
+//                           <p className="text-xs sm:text-sm text-gray-600 mt-1">
+//                             {doc.specialization}
+//                           </p>
+//                         </div>
+//                         <div
+//                           className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full font-medium text-xs sm:text-sm transition-colors whitespace-nowrap ${
+//                             selectedDoctor === doc.id
+//                               ? "bg-blue-600 text-white"
+//                               : "bg-gray-100 text-gray-700 hover:bg-blue-100 hover:text-blue-600"
+//                           }`}
+//                         >
+//                           {selectedDoctor === doc.id ? "Selected" : "Select"}
+//                         </div>
+//                       </div>
+//                     </div>
+//                   ))}
+//                 </div>
+//               </CardContent>
+//             </CollapsibleContent>
+//           </Collapsible>
+//         </Card>
+
+//         {/* Calendar + slots */}
+//         {selectedDoctor && (
+//           <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+//             <Collapsible defaultOpen>
+//               <CollapsibleTrigger className="flex justify-between items-center p-4 sm:p-6 w-full hover:bg-gray-50 transition-colors">
+//                 <h2 className="text-base sm:text-lg font-bold text-gray-900">
+//                   Select Dates & Times
+//                 </h2>
+//                 <ChevronDown className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
+//               </CollapsibleTrigger>
+
+//               <CollapsibleContent>
+//                 <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 pb-4 sm:pb-6">
+//                   {/* Calendar */}
+//                   <Calendar
+//                     selectedDates={selectedDates}
+//                     onSelect={setSelectedDates}
+//                     maxSelections={3}
+//                   />
+
+//                   {/* For each selected date → show slot buttons */}
+//                   {selectedDates.map((date) => {
+//                     const key = date.toDateString();
+
+//                     const filtered = availability.filter((a) => {
+//                       const d = new Date(a.startTime);
+//                       return d.toDateString() === date.toDateString();
+//                     });
+
+//                     return (
+//                       <div
+//                         key={key}
+//                         className="border border-gray-200 p-3 sm:p-6 rounded-lg bg-gray-50"
+//                       >
+//                         <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-3 sm:mb-4">
+//                           📅 Time slots for {date.toDateString()}
+//                         </h3>
+
+//                         {filtered.length === 0 ? (
+//                           <p className="text-gray-500 text-xs sm:text-sm">
+//                             No availability for this date.
+//                           </p>
+//                         ) : (
+//                           filtered.map((a) => {
+//                             const slots = generateSlots(a.startTime, a.endTime);
+
+//                             return (
+//                               <div
+//                                 key={a._id}
+//                                 className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3"
+//                               >
+//                                 {slots.map((slot, idx) => {
+//                                   const isSelected =
+//                                     selectedSlots[key] === slot;
+
+//                                   return (
+//                                     <button
+//                                       key={idx}
+//                                       onClick={() =>
+//                                         setSelectedSlots((prev: any) => ({
+//                                           ...prev,
+//                                           [key]: slot,
+//                                         }))
+//                                       }
+//                                       className={`py-2 px-2 rounded-lg font-medium text-xs transition-all duration-200 transform hover:scale-105 ${
+//                                         isSelected
+//                                           ? "bg-blue-600 text-white shadow-md scale-105"
+//                                           : "bg-white text-gray-700 border border-gray-200 hover:border-blue-400 hover:text-blue-600"
+//                                       }`}
+//                                     >
+//                                       {slot.start.toLocaleTimeString([], {
+//                                         hour: "2-digit",
+//                                         minute: "2-digit",
+//                                       })}
+//                                     </button>
+//                                   );
+//                                 })}
+//                               </div>
+//                             );
+//                           })
+//                         )}
+//                       </div>
+//                     );
+//                   })}
+
+//                   {/* Reason */}
+//                   <div>
+//                     <label className="block text-xs sm:text-sm font-semibold text-gray-900 mb-2">
+//                       Reason for Visit
+//                     </label>
+//                     <textarea
+//                       className="w-full border border-gray-300 p-2 sm:p-3 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+//                       placeholder="Please describe the reason for your appointment..."
+//                       value={reason}
+//                       onChange={(e) => setReason(e.target.value)}
+//                       rows={3}
+//                     />
+//                   </div>
+//                 </CardContent>
+//               </CollapsibleContent>
+//             </Collapsible>
+//           </Card>
+//         )}
+
+//         {/* Book Button */}
+//         <div className="flex justify-end pt-2 sm:pt-4 px-4 sm:px-0">
+//           <button
+//             disabled={loading || selectedDates.length === 0}
+//             onClick={handleBook}
+//             className={`w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base text-white transition-all duration-200 transform ${
+//               loading || selectedDates.length === 0
+//                 ? "bg-gray-400 cursor-not-allowed opacity-60"
+//                 : "bg-blue-600 hover:bg-blue-700 hover:shadow-lg hover:scale-105 active:scale-95"
+//             }`}
+//           >
+//             {loading ? (
+//               <span className="flex items-center justify-center gap-2">
+//                 <span className="inline-block animate-spin">⏳</span>
+//                 Booking...
+//               </span>
+//             ) : (
+//               "Book Appointment"
+//             )}
+//           </button>
+//         </div>
+//       </div>
+//     </DashboardLayout>
+//   );
+// }
 // // // import { DashboardLayout } from "../../layout/AppLayout";
 // // // import { Card, CardContent } from "../../components/ui/card";
 // // // import Button from "../../components/ui/Button";
